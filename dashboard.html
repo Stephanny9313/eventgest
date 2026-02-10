@@ -79,38 +79,8 @@
             </div>
         </div>
 
-        <!-- Tabla de Eventos -->
-        <div class="card mt-5">
-            <h3>Gestión de Eventos</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Tipo</th>
-                        <th>Programa</th>
-                        <th>Participantes</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="event in vm.events">
-                        <td>{{event.id}}</td>
-                        <td><input type="text" ng-model="event.name"></td>
-                        <td>
-                            <select ng-model="event.eventTypeId" ng-options="t.id as t.typeName for t in vm.eventTypes"></select>
-                        </td>
-                        <td>
-                            <select ng-model="event.programId" ng-options="p.id as p.name for p in vm.programs"></select>
-                        </td>
-                        <td>{{event.participantsCount || 0}}</td>
-                        <td>
-                            <button class="update" ng-click="vm.updateEvent(event)">Actualizar</button>
-                            <button class="delete" ng-click="vm.deleteEvent(event.id)">Eliminar</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        
+     
 
         
 
@@ -134,42 +104,9 @@ angular.module('eventgestApp', [])
 
     vm.loadData();
 
-    // Crear evento
-    vm.createEvent = function() {
-        $http.post('http://localhost:8080/api/events', vm.newEvent)
-        .then(r => {
-            vm.events.push(r.data);
-            vm.newEvent = {};
-        });
-    };
-
     // Actualizar evento
-    vm.updateEvent = function(event) {
-        $http.put(`http://localhost:8080/api/events/${event.id}`, event);
-    };
-
-    // Eliminar evento
-    vm.deleteEvent = function(id) {
-        $http.delete(`http://localhost:8080/api/events/${id}`)
-        .then(() => vm.events = vm.events.filter(e => e.id !== id));
-    };
-
-    // Inicializar gráficos
-    setTimeout(() => {
-        const ctx = document.getElementById('eventsChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: vm.events.map(e => e.name),
-                datasets: [{
-                    label: 'Participantes',
-                    data: vm.events.map(e => e.participantsCount || 0),
-                    backgroundColor: '#3e95cd'
-                }]
-            }
-        });
     }, 500);
-});
+
 </script>
 </body>
 </html>

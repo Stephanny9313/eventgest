@@ -1,10 +1,17 @@
 angular.module('eventgestApp')
   .controller('ParticipantController', function($scope, $http) {
       var vm = this;
-      
+
       vm.participants = [];
-      vm.participant = {};
-      vm.editingId = null;
+      vm.editParticipant = {};
+      vm.documentTypes = [
+          'REGISTRO_CIVIL',
+          'TARJETA_DE_IDENTIDAD',
+          'CEDULA_DE_CIUDADANIA',
+          'CEDULA_DE_EXTRANJERIA',
+          'PASAPORTE'
+      ];
+      vm.showForm = false;
       vm.notification = null;
 
       const API_URL = 'http://localhost:8080/api/participants';
@@ -14,7 +21,6 @@ angular.module('eventgestApp')
           $http.get(API_URL)
               .then(function(response) {
                   vm.participants = response.data;
-                  console.log('Participantes cargados:', vm.participants);
               })
               .catch(function(error) {
                   console.error('Error cargando participantes:', error);
@@ -22,38 +28,65 @@ angular.module('eventgestApp')
               });
       };
 
-      // Crear o actualizar participante
-      vm.saveParticipant = function() {
-          if (!vm.participant.name || !vm.participant.email) {
+      // Crear participante
+      vm.createParticipant = function() {
+          if (!vm.editParticipant.name || !vm.editParticipant.email) {
               vm.showNotification('⚠️ Nombre y Email son obligatorios', 'error');
               return;
           }
 
-          const method = vm.editingId ? 'PUT' : 'POST';
-          const url = vm.editingId ? `${API_URL}/${vm.editingId}` : API_URL;
-
-          $http({
-              method: method,
-              url: url,
-              data: vm.participant,
-              headers: { 'Content-Type': 'application/json' }
-          })
-          .then(function(response) {
-              vm.showNotification('✅ Participante guardado exitosamente', 'success');
-              vm.participant = {};
-              vm.editingId = null;
-              vm.loadParticipants();
-          })
-          .catch(function(error) {
-              console.error('Error creando participante:', error);
-              vm.showNotification('❌ Error: ' + (error.data?.message || error.statusText), 'error');
-          });
+          $http.post(API_URL, vm.editParticipant, { headers: { 'Content-Type': 'application/json' } })
+              .then(function() {
+                  vm.showNotification('✅ Participante creado', 'success');
+                  vm.editParticipant = {};
+                  vm.showForm = false;
+                  vm.loadParticipants();
+              })
+              .catch(function(error) {
+                  console.error('Error creando participante:', error);
+                  vm.showNotification('❌ Error: ' + (error.data?.message || error.statusText), 'error');
+              });
       };
 
-      // Editar participante
-      vm.editParticipant = function(participant) {
-          vm.participant = angular.copy(participant);
-          vm.editingId = participant.id;
+      // Actualizar participante
+      vm.updateParticipant = function() {
+          if (!vm.editParticipant.id) return;
+          $http.put(`${API_URL}/${vm.editParticipant.id}`, vm.editParticipant, { headers: { 'Content-Type': 'application/json' } })
+              .then(function() {
+                  vm.showNotification('✅ Participante actualizado', 'success');
+                  vm.editParticipant = {};
+                  vm.showForm = false;
+                  vm.loadParticipants();
+              })
+              .catch(function(error) {
+                  console.error('Error actualizando participante:', error);
+                  vm.showNotification('❌ Error: ' + (error.data?.message || error.statusText), 'error');
+              });
+      };
+
+      // Abrir formulario en modo edición
+      vm.editForm = function(participant) {
+          vm.editParticipant = angular.copy(participant);
+          vm.showForm = true;
+      };
+
+      // Cancelar edición/creación
+      vm.cancelEdit = function() {
+          vm.editParticipant = {};
+          vm.showForm = false;
+      };
+
+      // Buscar participantes
+      vm.search = function() {
+          if (!vm.searchText) { vm.loadParticipants(); return; }
+          $http.get(`${API_URL}/search`, { params: { q: vm.searchText } })
+              .then(function(resp) {
+                  vm.participants = resp.data;
+              })
+              .catch(function(err) {
+                  console.error('Error en búsqueda:', err);
+                  vm.showNotification('❌ Error en búsqueda', 'error');
+              });
       };
 
       // Eliminar participante
@@ -74,9 +107,7 @@ angular.module('eventgestApp')
       // Mostrar notificaciones
       vm.showNotification = function(message, type) {
           vm.notification = { message: message, type: type };
-          setTimeout(function() {
-              vm.notification = null;
-          }, 3000);
+          setTimeout(function() { vm.notification = null; }, 3000);
       };
 
       // Inicializar

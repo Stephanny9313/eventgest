@@ -27,7 +27,21 @@ angular.module('eventgestApp')
                 vm.error = 'Error cargando eventos';
             });
     };
+   vm.loadClients = function() {
+        EventService.listClients()
+            .then(resp => {
+                vm.clients = resp.data;
+                vm.error = '';
+            })
+            .catch(err => {
+                console.error("Error cargando clientes:", err);
+                vm.error = 'Error cargando clientes';
+            });
+    };
 
+
+
+    
     vm.loadEventTypes = function() { 
         EventTypeService.list()
             .then(resp => {
@@ -63,7 +77,8 @@ angular.module('eventgestApp')
                 console.error("Error cargando participantes:", err);
                 vm.error = 'Error cargando participantes';
             });
-    };
+        };
+
 
     // ===========================
     // CREAR ELEMENTOS
@@ -114,8 +129,29 @@ angular.module('eventgestApp')
             return;
         }
 
-        EventService.create(vm.event)
+        // Prepare payload: convert datetime-local to LocalDate string (YYYY-MM-DD)
+        function toLocalDateOnly(val) {
+            if (!val) return null;
+            // If already a string like '2026-02-11' return as-is
+            if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}$/)) return val;
+            var d = new Date(val);
+            if (isNaN(d.getTime())) return null;
+            return d.toISOString().split('T')[0];
+        }
+
+        var payload = angular.copy(vm.event);
+        payload.startAt = toLocalDateOnly(vm.event.startAt);
+        payload.endAt = toLocalDateOnly(vm.event.endAt);
+        if (payload.maxCapacity) payload.maxCapacity = parseInt(payload.maxCapacity, 10);
+        if (payload.programId) payload.programId = Number(payload.programId);
+        if (payload.eventTypeId) payload.eventTypeId = Number(payload.eventTypeId);
+        if (payload.ownerId) payload.ownerId = Number(payload.ownerId);
+
+        console.log('Crear evento payload:', payload);
+
+        EventService.create(payload)
             .then(resp => {
+                console.log('Evento creado, respuesta:', resp);
                 vm.events.push(resp.data);
                 vm.message = 'Evento creado exitosamente';
                 vm.event = {};
@@ -124,7 +160,8 @@ angular.module('eventgestApp')
                 setTimeout(() => vm.message = '', 3000);
             })
             .catch(err => {
-                vm.error = 'Error creando evento: ' + (err.data?.message || err.statusText);
+                console.error('Error creando evento detalle:', err);
+                vm.error = 'Error creando evento: ' + (err.data?.message || err.statusText || err.status);
             });
     };
 
@@ -167,4 +204,7 @@ angular.module('eventgestApp')
     vm.loadEventTypes();
     vm.loadPrograms();
     vm.loadParticipants();
+    // vm.loadClients(); removed — EventService does not provide listClients
+
 });
+    

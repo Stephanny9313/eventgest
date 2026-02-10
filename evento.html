@@ -52,7 +52,7 @@
     <div class="sidebar">
         <h2 class="text-center">EventGest</h2>
         <a href="dashboard.html">Dashboard</a>
-        <a href="#" class="active">Eventos</a>
+        <a href="evento.html" class="active">Eventos</a>
         <a href="registration.html">Participantes</a>
         <a href="app/registration.html">Registro</a>
         <a href="eventType.html">Tipos de Evento</a>
@@ -77,6 +77,10 @@
             <form ng-submit="vm.createEvent()">
 
                 <div>
+                    <label >Cliente</label>
+                    <input type="text"ng-model="vm.cliente.ownerId"/>
+                
+                    
                     <label>Título:</label>
                     <input type="text" ng-model="vm.event.title" required placeholder="Nombre del evento"/>
                 </div>
@@ -119,6 +123,17 @@
                     <select ng-model="vm.event.eventTypeId" 
                             ng-options="t.id as t.typeName for t in vm.eventTypes" required>
                         <option value="">-- Seleccione tipo --</option>
+                    </select>
+                </div>
+                <div>
+                    <label >Estadod     e evento </label>
+                    <select ng-model="vm.event.status" required>
+                        <option value="">-- Seleccione estado --</option>
+                        <option value="DRAFT">Borrador</option>
+                        <option value="PUBLISHED">Publicado</option>
+                        <option value="CANCELLED">Cancelado</option>
+                        <option Value="FINISHED">Finalizado</option>
+                        <option Value="ACTIVE">Activo</option>
                     </select>
                 </div>
 

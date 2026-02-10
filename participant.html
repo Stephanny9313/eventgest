@@ -306,13 +306,9 @@
             <div class="form-row">
                 <div>
                     <label>Tipo de Documento <span class="required">*</span></label>
-                    <select ng-model="vm.editParticipant.documentType" required>
-                        <option value="">-- Seleccionar --</option>
-                        <option value="CEDULA">Cédula de Identidad</option>
-                        <option value="PASAPORTE">Pasaporte</option>
-                        <option value="RUT">RUT</option>
-                        <option value="VISA">Visa</option>
-                        <option value="OTRO">Otro</option>
+                    <select ng-model="vm.editParticipant.documentType" required
+                            ng-options="t for t in vm.documentTypes">
+                        <option value="">-- Seleccione tipo --</option>
                     </select>
                 </div>
                 <div>
@@ -333,9 +329,9 @@
             </div>
 
             <div class="button-group">
-                <button type="button" ng-click="vm.cancelEdit()" class="btn btn-danger">❌ Cancelar</button>
-                <button type="submit" class="btn btn-primary" ng-if="!vm.editParticipant.id">✅ Crear</button>
-                <button type="submit" class="btn btn-primary" ng-if="vm.editParticipant.id">✅ Actualizar</button>
+                <button type="button" ng-click="vm.cancelEdit()" class="btn btn-danger">Cancelar</button>
+                <button type="submit" class="btn btn-primary" ng-if="!vm.editParticipant.id">Crear</button>
+                <button type="submit" class="btn btn-primary" ng-if="vm.editParticipant.id"> Actualizar</button>
             </div>
         </form>
     </div>
@@ -377,8 +373,8 @@
                     <td>{{participant.phone}}</td>
                     <td>
                         <div class="action-buttons">
-                            <button ng-click="vm.editForm(participant)" class="action-btn edit">✏️ Editar</button>
-                            <button ng-click="vm.deleteParticipant(participant.id)" class="action-btn delete">🗑️ Eliminar</button>
+                            <button ng-click="vm.editForm(participant)" class="action-btn edit">Editar</button>
+                            <button ng-click="vm.deleteParticipant(participant.id)" class="action-btn delete">Eliminar</button>
                         </div>
                     </td>
                 </tr>
@@ -386,7 +382,7 @@
         </table>
 
         <div ng-if="vm.participants.length === 0" class="empty-message">
-            📭 No hay participantes registrados. Crea el primero haciendo clic en "Nuevo Participante".
+            No hay participantes registrados. Crea el primero haciendo clic en "Nuevo Participante".
         </div>
     </div>
 
