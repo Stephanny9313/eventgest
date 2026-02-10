@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="eventgestApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscripción de Participantes - EventGest</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    
+    <!-- App Module -->
+    <script src="app/app.module.js"></script>
+    
+    <!-- Interceptors -->
+    <script src="app/services/http.interceptor.js"></script>
+    
+    <!-- Services -->
+    <script src="app/services/registration.service.js"></script>
+    <script src="app/services/event.service.js"></script>
+    <script src="app/services/participant.service.js"></script>
+    
+    <!-- Controllers -->
+    <script src="app/controllers/registration.controller.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        h2 { color: #2c3e50; margin-bottom: 20px; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        h3 { color: #34495e; margin-top: 20px; margin-bottom: 15px; }
+        .header-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .header-buttons a, .header-buttons button { 
+            padding: 10px 16px; 
+            text-decoration: none; 
+            border-radius: 6px; 
+            cursor: pointer;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s;
+        }
+        .btn-back { background: #95a5a6; color: white; }
+        .btn-back:hover { background: #7f8c8d; }
+        .btn-participants { background: #3498db; color: white; }
+        .btn-participants:hover { background: #2980b9; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4); }
+        form { margin-bottom: 20px; padding: 20px; background: #fafbfc; border-radius: 8px; border: 1px solid #ecf0f1; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; }
+        .form-row.full { grid-template-columns: 1fr; }
+        label { display: block; font-weight: 600; color: #2c3e50; margin-bottom: 6px; }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #ecf0f1; 
+            border-radius: 6px; 
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 5px rgba(102, 126, 234, 0.1); }
+        button { 
+            padding: 12px 24px; 
+            background: #667eea; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+        button.btn-success { background: #28a745; }
+        button.btn-success:hover { background: #218838; }
+        button.btn-danger { background: #dc3545; }
+        button.btn-danger:hover { background: #c82333; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #ecf0f1; }
+        .tabs button { 
+            background: transparent; 
+            color: #7f8c8d; 
+            padding: 12px 20px; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 600; 
+            border-bottom: 3px solid transparent; 
+            transition: all 0.3s;
+            width: auto;
+            margin: 0;
+        }
+        .tabs button.active { color: #667eea; border-bottom-color: #667eea; }
+        .tabs button:hover { color: #667eea; }
+        .notification { 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border-radius: 6px;
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .notification.success { background: #d4edda; color: #155724; border-left-color: #28a745; }
+        .notification.error { background: #f8d7da; color: #721c24; border-left-color: #dc3545; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #667eea; color: white; padding: 15px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #ecf0f1; }
+        tr:hover { background: #f8f9fa; }
+        .action-link { color: #667eea; text-decoration: none; cursor: pointer; margin-right: 10px; font-weight: 600; }
+        .action-link:hover { text-decoration: underline; }
+        .btn-register { background: #28a745; color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; border: none; }
+        .btn-register:hover { background: #218838; }
+        .empty-message { text-align: center; padding: 40px; color: #95a5a6; }
+        .form-section { border: 1px solid #ecf0f1; padding: 20px; border-radius: 8px; margin-bottom: 20px; background: #fafbfc; }
+    </style>
+</head>
+<body ng-controller="RegistrationController as vm">
+
+<div class="container">
+    <div class="header-buttons">
+        <a href="dashboard.html" class="btn-back">← Volver al Dashboard</a>
+        <a href="participant.html" class="btn-participants">👥 Gestionar Participantes</a>
+    </div>
+    
+    <h2>Registro de Participantes en Eventos</h2>
+
+    <!-- Notificaciones -->
+    <div ng-if="vm.notification" ng-class="'notification ' + vm.notification.type">
+        {{ vm.notification.message }}
+    </div>
+
+    <!-- TABS para cambiar vista -->
+    <div class="tabs">
+        <button ng-click="vm.showTab = 'registrar'" ng-class="{active: vm.showTab === 'registrar'}">
+             Registrar Existente
+        </button>
+        <button ng-click="vm.showTab = 'crear'" ng-class="{active: vm.showTab === 'crear'}">
+            Crear Nuevo registro
+        </button>
+    </div>
+
+    <!-- TAB 1: REGISTRAR PARTICIPANTE EXISTENTE A EVENTO -->
+    <div ng-show="vm.showTab === 'registrar'" class="form-section">
+        <h3> Registrar Participante Existente a Evento</h3>
+        <form ng-submit="vm.registerParticipant()">
+            <div class="form-row">
+                <div>
+                    <label>Evento: <span style="color: red;">*</span></label>
+                    <select ng-model="vm.registration.eventId" ng-options="e.id as e.name for e in vm.events" required>
+                        <option value="">-- Seleccionar Evento --</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Participante: <span style="color: red;">*</span></label>
+                    <select ng-model="vm.registration.participantId" ng-options="p.id as (p.name + ' | ' + p.email) for p in vm.participants" required>
+                        <option value="">-- Seleccionar Participante --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row full">
+                <div>
+                    <label>Asistencia: <span style="color: red;">*</span></label>
+                    <select ng-model="vm.registration.attendance" required>
+                        <option value="">-- Seleccionar Estado --</option>
+                        <option value="true">Asistió</option>
+                        <option value="false">Pendiente</option>
+                </div>
+            </div>
+            <button type="submit" class="btn-success">✅ Registrar al Evento</button>
+        </form>
+    </div>
+
+
+
+
+    <!-- TABLA DE REGISTROS (INSCRIPCIONES) -->
+    <h3>✅ Inscripciones Activas</h3>
+    <div style="overflow-x: auto;">
+        <table ng-if="vm.registrations.length > 0">
+            <thead>
+                <tr>
+                    <th>Participante</th>
+                    <th>Email</th>
+                    <th>Evento</th>
+                    <th>Fecha Registro</th>
+                    <th>Asistencia</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="reg in vm.registrations">
+                    <td><strong>{{reg.participantName || reg.participant?.name}}</strong></td>
+                    <td>{{reg.participant?.email || 'N/A'}}</td>
+                    <td><strong>{{reg.eventTitle || reg.event?.name}}</strong></td>
+                    <td>{{reg.registrationDate || reg.createdAt | date:'dd/MM/yyyy HH:mm'}}</td>
+                    <td>
+                        <span ng-if="reg.attendance" style="color: green; font-weight: bold;">✅ Asistió</span>
+                        <span ng-if="!reg.attendance" style="color: #ccc;">❌ Pendiente</span>
+                    </td>
+                    <td>
+                        <a class="action-link" ng-click="vm.deleteRegistration(reg.id)">🗑️ Eliminar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div ng-if="vm.registrations.length === 0" class="empty-message">
+            ✅ No hay inscripciones aún. Registra un participante en un evento.
+        </div>
+    </div>
+</div>  
+</body>
+</html>

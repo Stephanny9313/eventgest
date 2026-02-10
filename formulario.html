@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="eventgestApp">
+<head>
+  <meta charset="UTF-8">
+  <title>EventGest</title>
+
+  <!-- AngularJS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+
+  <!-- App -->
+  <script src="app/app.module.js"></script>
+  <script src="app/services/event.service.js"></script>
+  <script src="app/controllers/event.controller.js"></script>
+</head>
+
+<body ng-controller="EventController as vm">
+
+  <h2>Crear Evento</h2>
+  <form ng-submit="vm.createEvent()">
+      <label>Título:</label>
+      <input type="text" ng-model="vm.event.title" required />
+
+      <label>Descripción:</label>
+      <input type="text" ng-model="vm.event.description" required />
+
+      <label>Lugar:</label>
+      <input type="text" ng-model="vm.event.place" required />
+
+      <label>Fecha inicio:</label>
+      <input type="datetime-local" ng-model="vm.event.startAt" required />
+
+      <label>Fecha fin:</label>
+      <input type="datetime-local" ng-model="vm.event.endAt" required />
+
+      <label>Capacidad:</label>
+      <input type="number" ng-model="vm.event.capacity" required />
+
+      <label>Status:</label>
+      <select ng-model="vm.event.status" required>
+          <option value="DRAFT">Borrador</option>
+          <option value="PUBLISHED">Publicado</option>
+          <option value="CANCELLED">Cancelado</option>
+          <option Value="FINISHED">Finalizado</option>
+          <option Value="ACTIVE">Activo</option>
+
+
+      </select>
+
+      <button type="submit">Crear Evento</button>
+  </form>
+
+  <hr>
+
+  <h2>Eventos</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Título</th>
+        <th>Estado</th>
+        <th>Fecha inicio</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="e in vm.events">
+        <td>{{ e.id }}</td>
+        <td>{{ e.title }}</td>
+        <td>{{ e.status }}</td>
+        <td>{{ e.startAt | date:'short' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <br>
+
+  <button ng-disabled="vm.page === 0"
+          ng-click="vm.page = vm.page - 1; vm.loadEvents()">
+    Anterior
+  </button>
+
+  <button ng-disabled="vm.page >= vm.totalPages - 1"
+          ng-click="vm.page = vm.page + 1; vm.loadEvents()">
+    Siguiente
+  </button>
+
+</body>
+</html>

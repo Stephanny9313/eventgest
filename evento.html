@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="eventgestApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Eventos - Dashboard</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+
+    <!-- Chart.js para gráficas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- App Module -->
+    <script src="app/app.module.js"></script>
+    
+    <!-- Interceptors -->
+    <script src="app/services/http.interceptor.js"></script>
+    
+    <!-- Services -->
+    <script src="app/services/event.service.js"></script>
+    <script src="app/services/program.service.js"></script>
+    <script src="app/services/eventType.service.js"></script>
+    <script src="app/services/participant.service.js"></script>
+    
+    <!-- Controllers -->
+    <script src="app/controllers/event.controller.js"></script>
+
+    <!-- Estilos generales -->
+    <style>
+        body { font-family: 'Poppins', sans-serif; margin: 0; background: #f4f6f8; }
+        .sidebar { width: 220px; height: 100vh; position: fixed; background: #10666d; color: white; padding-top: 20px; }
+        .sidebar a { display: block; color: white; padding: 12px 20px; text-decoration: none; margin: 5px 0; border-radius: 4px; }
+        .sidebar a:hover, .sidebar a.active { background: #23b0b4; }
+        .main { margin-left: 240px; padding: 20px; }
+        h2, h3 { color: #15181e; }
+        form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        form div { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input, textarea, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 20px; background: #10666d; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #23b0b4; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background: #10666d; color: white; }
+        .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+    </style>
+</head>
+<body ng-controller="EventController as vm">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2 class="text-center">EventGest</h2>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="#" class="active">Eventos</a>
+        <a href="registration.html">Participantes</a>
+        <a href="app/registration.html">Registro</a>
+        <a href="eventType.html">Tipos de Evento</a>
+        <a href="programs.html">Programas</a>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main">
+        <h2>Gestión de Eventos</h2>
+
+        <!-- MENSAJES -->
+        <div style="color: green; padding: 10px; margin-bottom: 15px;" ng-if="vm.message">
+            {{vm.message}}
+        </div>
+        <div style="color: red; padding: 10px; margin-bottom: 15px; background: #ffe6e6; border-radius: 4px;" ng-if="vm.error">
+            {{vm.error}}
+        </div>
+
+        <!-- FORMULARIO DE EVENTO -->
+        <div class="card">
+            <h3>Crear Nuevo Evento</h3>
+            <form ng-submit="vm.createEvent()">
+
+                <div>
+                    <label>Título:</label>
+                    <input type="text" ng-model="vm.event.title" required placeholder="Nombre del evento"/>
+                </div>
+
+                <div>
+                    <label>Descripción:</label>
+                    <textarea ng-model="vm.event.description" placeholder="Descripción del evento"></textarea>
+                </div>
+
+                <div>
+                    <label>Inicio:</label>
+                    <input type="datetime-local" ng-model="vm.event.startAt" required/>
+                </div>
+
+                <div>
+                    <label>Fin:</label>
+                    <input type="datetime-local" ng-model="vm.event.endAt" required/>
+                </div>
+
+                <div>
+                    <label>Lugar:</label>
+                    <input type="text" ng-model="vm.event.place" placeholder="Lugar del evento"/>
+                </div>
+
+                <div>
+                    <label>Capacidad máxima:</label>
+                    <input type="number" ng-model="vm.event.maxCapacity" placeholder="Máximo de asistentes"/>
+                </div>
+
+                <div>
+                    <label>Programa:</label>
+                    <select ng-model="vm.event.programId" 
+                            ng-options="p.id as p.name for p in vm.programs" required>
+                        <option value="">-- Seleccione programa --</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Tipo de evento:</label>
+                    <select ng-model="vm.event.eventTypeId" 
+                            ng-options="t.id as t.typeName for t in vm.eventTypes" required>
+                        <option value="">-- Seleccione tipo --</option>
+                    </select>
+                </div>
+
+                <button type="submit">Crear Evento</button>
+            </form>
+        </div>
+
+        <!-- TABLA DE EVENTOS -->
+        <div class="card">
+            <h3>Eventos Registrados</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Programa</th>
+                        <th>Tipo</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th>Lugar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="event in vm.events">
+                        <td>{{event.title}}</td>
+                        <td>{{event.programName || event.programId}}</td>
+                        <td>{{event.eventTypeName || event.eventTypeId}}</td>
+                        <td>{{event.startAt | date:'short'}}</td>
+                        <td>{{event.endAt | date:'short'}}</td>
+                        <td>{{event.place}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

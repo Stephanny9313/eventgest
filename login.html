@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="eventgestApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - EventGest</title>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+    <link rel="stylesheet" href="app/css/login.css">
+    
+    <!-- App Module -->
+    <script src="app/app.module.js"></script>
+    
+    <!-- Interceptors -->
+    <script src="app/services/http.interceptor.js"></script>
+    
+    <!-- Services -->
+    <script src="app/services/login.service.js"></script>
+    
+    <!-- Controllers -->
+    <script src="app/controllers/login.controller.js"></script>
+
+    
+</head>
+<body ng-controller="LoginController as vm">
+
+    <div class="login-container">
+        <h2>Iniciar Sesión</h2>
+
+        <!-- Notificaciones -->
+        <div class="notification" ng-if="vm.notification">
+            <span ng-class="{'error': vm.notification.type === 'error', 'success': vm.notification.type === 'success'}">
+                {{vm.notification.message}}
+            </span>
+        </div>
+
+        <form ng-submit="vm.login()">
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" ng-model="vm.credentials.email" placeholder="Email" required>
+            </div>
+
+            <div class="form-group">
+                <label>Contraseña:</label>
+                <input type="password" ng-model="vm.credentials.password" placeholder="Contraseña" required>
+            </div>
+
+            <button type="submit">Ingresar</button>
+        </form>
+    </div>
+
+</body>
+</html>

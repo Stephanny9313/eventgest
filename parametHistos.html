@@ -1,0 +1,39 @@
+<div ng-controller="ParametHistosController as vm">
+  <h3>Historial de Parámetro</h3>
+
+  <label>Parámetro ID:
+    <input type="number" ng-model="vm.parameterId">
+  </label>
+  <button ng-click="vm.loadHistories()">Cargar historial</button>
+
+  <table border="1" ng-if="vm.histories.length > 0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Valor Anterior</th>
+        <th>Valor Nuevo</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="h in vm.histories">
+        <td>{{h.id}}</td>
+        <td>{{h.previousValue}}</td>
+        <td>{{h.newValue}}</td>
+        <td>{{h.date}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>Registrar nuevo cambio</h4>
+  <label>User ID:
+    <input type="number" ng-model="vm.newChange.userId">
+  </label>
+  <label>Valor Anterior:
+    <input type="text" ng-model="vm.newChange.oldValue">
+  </label>
+  <label>Valor Nuevo:
+    <input type="text" ng-model="vm.newChange.newValue">
+  </label>
+  <button ng-click="vm.addChange()">Registrar Cambio</button>
+</div>

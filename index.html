@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html ng-app="eventgestApp">
+<head>
+    <meta charset="UTF-8">
+    <title>Login EventGest</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <script src="app.js"></script>
+    <script src="authService.js"></script>
+    <script src="authController.js"></script>
+</head>
+<body ng-controller="AuthController as vm">
+
+    <h2>Login</h2>
+
+    <form ng-submit="vm.login()">
+        <label>Email:</label>
+        <input type="email" ng-model="vm.credentials.email" required>
+        <br>
+
+        <label>Contraseña:</label>
+        <input type="password" ng-model="vm.credentials.password" required>
+        <br>
+
+        <button type="submit">Ingresar</button>
+    </form>
+
+    <p style="color:red" ng-if="vm.error">{{vm.error}}</p>
+
+</body>
+</html>

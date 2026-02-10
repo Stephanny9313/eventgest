@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="eventgestApp">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Parámetros</title>
+
+  <!-- AngularJS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+
+  <!-- App -->
+  <script src="app/app.module.js"></script>
+  <script src="app/services/parameter.service.js"></script>
+  <script src="app/controllers/parameter.controller.js"></script>
+</head>
+<body ng-controller="ParameterController as vm">
+
+  <h2>Crear / Editar Parámetro</h2>
+  <form ng-submit="vm.create()">
+    <label>Clave:</label>
+    <input type="text" ng-model="vm.newParameter.clue" required />
+
+    <label>Valor:</label>
+    <input type="text" ng-model="vm.newParameter.value" required />
+
+    <label>Tipo:</label>
+    <input type="text" ng-model="vm.newParameter.type" required />
+
+    <label>Modificable:</label>
+    <select ng-model="vm.newParameter.modifiable">
+      <option value="true">Sí</option>
+      <option value="false">No</option>
+    </select>
+
+    <button type="submit">Crear Parámetro</button>
+  </form>
+
+  <hr>
+
+  <h2>Lista de Parámetros</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Clave</th>
+        <th>Valor</th>
+        <th>Tipo</th>
+        <th>Modificable</th>
+        <th>Activo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="p in vm.parameters">
+        <td>{{p.id}}</td>
+        <td><input type="text" ng-model="p.clue" /></td>
+        <td><input type="text" ng-model="p.value" /></td>
+        <td><input type="text" ng-model="p.type" /></td>
+        <td>
+          <select ng-model="p.modifiable">
+            <option value="true">Sí</option>
+            <option value="false">No</option>
+          </select>
+        </td>
+        <td>{{p.active !== false ? 'Sí' : 'No'}}</td>
+        <td>
+          <button ng-click="vm.update(p)">Actualizar</button>
+          <button ng-click="vm.deactivate(p)" ng-disabled="p.active === false">Desactivar</button>
+          <button ng-click="vm.delete(p)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</body>
+</html>
