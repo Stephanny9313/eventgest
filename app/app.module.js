@@ -1,2 +1,2 @@
-var app = angular.module('eventgestApp', []);
+var app = angular.module('eventgestApp', ['ngRoute']);
 
